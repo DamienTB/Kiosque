@@ -1,0 +1,36 @@
+[
+  { "id": "lemonde", "name": "Le Monde", "lang": "fr", "access": "mixed", "subscribed": true, "enabled": true, "feeds": ["https://www.lemonde.fr/rss/une.xml"] },
+  { "id": "franceinfo", "name": "franceinfo", "lang": "fr", "access": "free", "enabled": true, "feeds": ["https://www.francetvinfo.fr/titres.rss"] },
+  { "id": "20minutes", "name": "20 Minutes", "lang": "fr", "access": "free", "enabled": false, "feeds": ["https://www.20minutes.fr/feeds/rss-une.xml"] },
+  { "id": "theconversation-fr", "name": "The Conversation FR", "lang": "fr", "access": "free", "enabled": true, "feeds": ["https://theconversation.com/fr/articles.atom"] },
+  { "id": "liberation", "name": "Libération", "lang": "fr", "access": "mixed", "enabled": true, "feeds": ["https://www.liberation.fr/arc/outboundfeeds/rss-all/?outputType=xml"] },
+  { "id": "lefigaro", "name": "Le Figaro", "lang": "fr", "access": "mixed", "enabled": false, "feeds": ["https://www.lefigaro.fr/rss/figaro_actualites.xml"] },
+  { "id": "leparisien", "name": "Le Parisien", "lang": "fr", "access": "mixed", "enabled": false, "feeds": ["https://feeds.leparisien.fr/leparisien/rss"] },
+  { "id": "courrierinternational", "name": "Courrier international", "lang": "fr", "access": "mixed", "enabled": true, "feeds": ["https://www.courrierinternational.com/feed/all/rss.xml"] },
+  { "id": "mediapart", "name": "Mediapart", "lang": "fr", "access": "paid", "enabled": false, "feeds": ["https://www.mediapart.fr/articles/feed"] },
+
+  { "id": "g1", "name": "G1", "lang": "pt", "access": "free", "enabled": true, "feeds": ["https://g1.globo.com/rss/g1/"] },
+  { "id": "bbcbrasil", "name": "BBC News Brasil", "lang": "pt", "access": "free", "enabled": true, "feeds": ["https://feeds.bbci.co.uk/portuguese/rss.xml"] },
+  { "id": "agenciabrasil", "name": "Agência Brasil", "lang": "pt", "access": "free", "enabled": false, "feeds": ["https://agenciabrasil.ebc.com.br/rss/ultimasnoticias/feed.xml"] },
+  { "id": "interceptbrasil", "name": "The Intercept Brasil", "lang": "pt", "access": "free", "enabled": false, "feeds": ["https://www.intercept.com.br/feed/"] },
+  { "id": "folha", "name": "Folha de S.Paulo", "lang": "pt", "access": "mixed", "enabled": true, "feeds": ["https://feeds.folha.uol.com.br/emcimadahora/rss091.xml"] },
+  { "id": "oglobo", "name": "O Globo", "lang": "pt", "access": "mixed", "enabled": false, "feeds": ["https://oglobo.globo.com/rss/oglobo"] },
+  { "id": "estadao", "name": "Estadão", "lang": "pt", "access": "mixed", "enabled": false, "feeds": ["https://www.estadao.com.br/arc/outboundfeeds/feeds/rss/sections/politica/", "https://www.estadao.com.br/arc/outboundfeeds/feeds/rss/sections/internacional/", "https://www.estadao.com.br/arc/outboundfeeds/feeds/rss/sections/economia/"] },
+  { "id": "nexo", "name": "Nexo Jornal", "lang": "pt", "access": "paid", "enabled": false, "feeds": ["https://www.nexojornal.com.br/rss.xml"] },
+
+  { "id": "ansa", "name": "ANSA", "lang": "it", "access": "free", "enabled": true, "feeds": ["https://www.ansa.it/sito/notizie/topnews/topnews_rss.xml"] },
+  { "id": "corriere", "name": "Corriere della Sera", "lang": "it", "access": "mixed", "enabled": true, "feeds": ["https://www.corriere.it/dynamic-feed/rss/section/Esteri.xml", "https://www.corriere.it/dynamic-feed/rss/section/Politica.xml", "https://www.corriere.it/dynamic-feed/rss/section/Cronache.xml", "https://www.corriere.it/dynamic-feed/rss/section/Economia.xml", "https://www.corriere.it/dynamic-feed/rss/section/Cultura-Opinioni.xml"] },
+  { "id": "repubblica", "name": "la Repubblica", "lang": "it", "access": "mixed", "enabled": true, "feeds": ["https://www.repubblica.it/rss/homepage/rss2.0.xml"] },
+  { "id": "lastampa", "name": "La Stampa", "lang": "it", "access": "mixed", "enabled": false, "feeds": ["https://www.lastampa.it/rss/copertina.xml"] },
+  { "id": "internazionale", "name": "Internazionale", "lang": "it", "access": "mixed", "enabled": false, "feeds": ["https://www.internazionale.it/sitemaps/rss.xml"] },
+  { "id": "sole24ore", "name": "Il Sole 24 Ore", "lang": "it", "access": "paid", "enabled": false, "feeds": ["https://www.ilsole24ore.com/rss/italia.xml"] },
+
+  { "id": "guardian", "name": "The Guardian", "lang": "en", "access": "free", "enabled": true, "feeds": ["https://www.theguardian.com/international/rss"] },
+  { "id": "bbcnews", "name": "BBC News", "lang": "en", "access": "free", "enabled": true, "feeds": ["https://feeds.bbci.co.uk/news/rss.xml"] },
+  { "id": "npr", "name": "NPR", "lang": "en", "access": "free", "enabled": false, "feeds": ["https://feeds.npr.org/1001/rss.xml"] },
+  { "id": "aljazeera", "name": "Al Jazeera English", "lang": "en", "access": "free", "enabled": false, "feeds": ["https://www.aljazeera.com/xml/rss/all.xml"] },
+  { "id": "nyt", "name": "The New York Times", "lang": "en", "access": "mixed", "enabled": true, "feeds": ["https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml"] },
+  { "id": "atlantic", "name": "The Atlantic", "lang": "en", "access": "mixed", "enabled": false, "feeds": ["https://www.theatlantic.com/feed/all/"] },
+  { "id": "economist", "name": "The Economist", "lang": "en", "access": "paid", "enabled": false, "feeds": ["https://www.economist.com/latest/rss.xml"] },
+  { "id": "ft", "name": "Financial Times", "lang": "en", "access": "paid", "enabled": false, "feeds": ["https://www.ft.com/rss/home"] }
+]

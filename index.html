@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kiosque</title>
+  <meta name="description" content="Ton édition du matin, composée à partir de tes journaux.">
+  <meta name="theme-color" content="#f5efe4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#181614" media="(prefers-color-scheme: dark)">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">Kiosque</span>
+      <span class="date" id="edition-date"></span>
+    </div>
+    <div class="progress" id="progress" aria-live="polite"></div>
+  </header>
+
+  <main>
+    <!-- Édition du jour -->
+    <section class="view" id="view-edition" data-view="edition">
+      <div class="stack" id="stack" aria-label="Articles de l'édition"></div>
+      <div class="actions" id="actions">
+        <button class="round skip" id="btn-skip" aria-label="Passer (flèche gauche)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+        <button class="round undo" id="btn-undo" aria-label="Annuler le dernier choix">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg>
+        </button>
+        <button class="round keep" id="btn-keep" aria-label="Garder (flèche droite)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
+        </button>
+      </div>
+      <p class="hint" id="hint">Glisse à droite pour garder, à gauche pour passer. Touche une carte pour en voir plus.</p>
+    </section>
+
+    <!-- À lire -->
+    <section class="view" id="view-saved" data-view="saved" hidden>
+      <div class="saved-head">
+        <h1>À lire</h1>
+        <div class="seg" role="tablist">
+          <button role="tab" data-filter="unread" aria-selected="true">Non lus</button>
+          <button role="tab" data-filter="all" aria-selected="false">Tous</button>
+        </div>
+      </div>
+      <div id="saved-list"></div>
+    </section>
+
+    <!-- Réglages -->
+    <section class="view" id="view-settings" data-view="settings" hidden>
+      <h1>Réglages</h1>
+
+      <div class="panel">
+        <h2>L'édition du matin</h2>
+        <label class="row">
+          <span>Nombre d'articles</span>
+          <output id="size-out"></output>
+        </label>
+        <input type="range" id="size" min="15" max="60" step="5">
+        <h3>Répartition par langue</h3>
+        <div id="lang-weights"></div>
+        <p class="note">Les changements s'appliquent à l'édition de demain, ou tout de suite avec « Recomposer ».</p>
+        <button class="btn" id="btn-recompose">Recomposer l'édition du jour</button>
+      </div>
+
+      <div class="panel">
+        <h2>Journaux</h2>
+        <p class="note">
+          <span class="acc free">Gratuit</span> tout est en accès libre ·
+          <span class="acc mixed">Mixte</span> une partie réservée aux abonnés ·
+          <span class="acc paid">Payant</span> surtout réservé aux abonnés.
+          Coche « Abonné » pour les journaux auxquels tu es abonné.
+        </p>
+        <div id="sources"></div>
+      </div>
+
+      <p class="note center" id="pool-info"></p>
+    </section>
+  </main>
+
+  <nav class="tabbar" aria-label="Navigation">
+    <button data-tab="edition" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+      <span>Édition</span>
+    </button>
+    <button data-tab="saved">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
+      <span>À lire</span><b class="badge" id="saved-count" hidden></b>
+    </button>
+    <button data-tab="settings">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+      <span>Réglages</span>
+    </button>
+  </nav>
+
+  <!-- Détail d'un article -->
+  <dialog id="detail">
+    <article class="detail-body">
+      <div class="detail-img" id="detail-img"></div>
+      <div class="detail-text">
+        <div class="meta" id="detail-meta"></div>
+        <h2 id="detail-title"></h2>
+        <p id="detail-summary"></p>
+        <a class="btn primary" id="detail-link" target="_blank" rel="noopener">Lire l'article sur le site</a>
+        <div class="detail-actions" id="detail-actions">
+          <button class="btn" data-act="skip">Passer</button>
+          <button class="btn keep" data-act="keep">Garder</button>
+        </div>
+        <button class="btn ghost" id="detail-close">Fermer</button>
+      </div>
+    </article>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

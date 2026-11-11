@@ -1,0 +1,36 @@
+# Chaque matin : relève les flux des journaux et publie l'application sur GitHub Pages.
+name: Édition du matin
+
+on:
+  schedule:
+    - cron: "15 4 * * *"     # 4 h 15 UTC = 5 h 15 à Paris en hiver, 6 h 15 en été
+  workflow_dispatch:          # bouton « Run workflow » pour lancer à la main
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publier:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Relever les journaux
+        shell: pwsh
+        run: ./scripts/collect.ps1
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deploy
+        uses: actions/deploy-pages@v4
