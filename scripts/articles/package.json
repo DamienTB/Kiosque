@@ -1,0 +1,10 @@
+{
+  "name": "kiosque-articles",
+  "private": true,
+  "type": "module",
+  "description": "Prépare la version hors connexion des articles de pool.json",
+  "dependencies": {
+    "@mozilla/readability": "0.6.0",
+    "linkedom": "0.18.15"
+  }
+}

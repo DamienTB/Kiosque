@@ -28,6 +28,16 @@ jobs:
       - name: Relever les journaux
         shell: pwsh
         run: ./scripts/collect.ps1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Préparer les articles pour la lecture hors connexion
+        continue-on-error: true      # si ça échoue, l'édition est quand même publiée
+        working-directory: scripts/articles
+        run: |
+          npm ci --no-audit --no-fund
+          node extract.mjs
+          rm -rf node_modules
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

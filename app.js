@@ -24,6 +24,71 @@ const store = {
   },
 };
 
+/* ---------- lecture hors connexion ----------
+   Chaque matin, GitHub prépare une version texte de chaque article (data/articles/<id>.json).
+   Quand on garde un article, l'app télécharge ce texte et ses images dans le cache du téléphone :
+   on peut ensuite le lire dans « À lire » sans réseau (dans le train…). */
+const ART_CACHE = 'kiosque-articles';
+const IMG_CACHE = 'kiosque-images';
+const canCache = 'caches' in window;
+const artUrl = (id) => new URL('data/articles/' + id.replace(/[^a-z0-9-]/gi, '-') + '.json', location.href).href;
+const artImages = (art, lead) => [lead, ...(art.blocks || []).filter((b) => b.t === 'img').map((b) => b.src)].filter(Boolean);
+const preloading = new Set();
+let askedPersist = false;
+
+async function preload(entry) {
+  if (!canCache || entry.stored || !entry.offline || preloading.has(entry.id)) return;
+  preloading.add(entry.id);
+  try {
+    if (!askedPersist) { askedPersist = true; navigator.storage?.persist?.().catch(() => {}); }
+    const res = await fetch(artUrl(entry.id));
+    if (!res.ok) throw new Error(res.status);
+    const art = await res.clone().json();
+    await (await caches.open(ART_CACHE)).put(artUrl(entry.id), res);
+    const ic = await caches.open(IMG_CACHE);
+    await Promise.all(artImages(art, entry.image).map(async (u) => {
+      try {
+        if (await ic.match(u)) return;
+        // images d'autres sites : réponse « opaque », mais le navigateur sait l'afficher depuis le cache
+        await ic.put(u, await fetch(u, { mode: 'no-cors', credentials: 'omit', referrerPolicy: 'no-referrer' }));
+      } catch { /* image indisponible : l'article reste lisible */ }
+    }));
+    const cur = saved.find((x) => x.id === entry.id);
+    if (!cur) { forget(entry.id, entry.image); return; }
+    cur.stored = true;
+    cur.offline = art.partial ? 'partial' : 'full';
+    store.set('saved', saved);
+    if (!$('#view-saved').hidden) renderSaved();
+  } catch { /* pas de réseau ou pas de version hors connexion : on réessaiera plus tard */ }
+  finally { preloading.delete(entry.id); }
+}
+
+async function forget(id, lead) {
+  if (!canCache) return;
+  try {
+    const ac = await caches.open(ART_CACHE);
+    const res = await ac.match(artUrl(id));
+    if (!res) return;
+    const art = await res.json();
+    const keep = new Set(saved.filter((s) => s.id !== id).map((s) => s.image));
+    const ic = await caches.open(IMG_CACHE);
+    await Promise.all(artImages(art, lead).filter((u) => !keep.has(u)).map((u) => ic.delete(u)));
+    await ac.delete(artUrl(id));
+  } catch { /* rien de grave */ }
+}
+
+// rattrape les articles gardés sans réseau, ou avant que leur version hors connexion soit connue
+function syncOffline() {
+  if (!canCache || !navigator.onLine) return;
+  const byId = Object.fromEntries((pool?.items || []).map((it) => [it.id, it]));
+  for (const s of saved) {
+    if (s.stored || s.read) continue;
+    if (!s.offline && byId[s.id]?.offline) { s.offline = byId[s.id].offline; store.set('saved', saved); }
+    preload(s);
+  }
+}
+window.addEventListener('online', syncOffline);
+
 /* ---------- état ---------- */
 let SOURCES = [];                 // depuis sources.json
 let SRC = {};                     // id -> source
@@ -185,8 +250,11 @@ function decide(action) {
   edition.decisions[item.id] = action;
   edition.pos++;
   if (action === 'keep' && !saved.some((s) => s.id === item.id)) {
-    saved.unshift(Object.assign({}, item, { savedAt: new Date().toISOString(), day: edition.date, read: false }));
+    const offline = item.offline || pool?.items.find((it) => it.id === item.id)?.offline;
+    const entry = Object.assign({}, item, { savedAt: new Date().toISOString(), day: edition.date, read: false, offline, stored: false });
+    saved.unshift(entry);
     store.set('saved', saved);
+    preload(entry);
   }
   log.push({ id: item.id, source: item.source, lang: SRC[item.source]?.lang, category: item.category, action, t: Date.now() });
   if (log.length > MAX_LOG) log = log.slice(-MAX_LOG);
@@ -200,7 +268,7 @@ function undo() {
   const item = edition.items[edition.pos];
   const action = edition.decisions[item.id];
   delete edition.decisions[item.id];
-  if (action === 'keep') { saved = saved.filter((s) => s.id !== item.id); store.set('saved', saved); }
+  if (action === 'keep') { saved = saved.filter((s) => s.id !== item.id); store.set('saved', saved); forget(item.id, item.image); }
   log.pop(); store.set('log', log);
   store.set('edition', edition);
   renderStack(); renderProgress(); renderSavedCount();
@@ -387,9 +455,11 @@ function renderSaved() {
   for (const s of items) {
     if (s.day !== lastDay) { list.append(h('div', { class: 'day' }, dayLabel(s.day))); lastDay = s.day; }
     const row = h('div', { class: 'item' + (s.read ? ' read' : '') },
-      h('a', { class: 'open', href: s.link, target: '_blank', rel: 'noopener', onclick: () => setRead(s.id, true) },
+      h('a', { class: 'open', href: s.link, target: '_blank', rel: 'noopener', onclick: (e) => {
+        if (s.stored) { e.preventDefault(); openReader(s); } else setRead(s.id, true);
+      } },
         s.image ? h('div', { class: 'thumb' }, img(s.image)) : null,
-        h('div', { class: 'txt' }, h('div', { class: 'meta' }, metaLine(s)), h('h3', null, s.title))),
+        h('div', { class: 'txt' }, h('div', { class: 'meta' }, metaLine(s)), h('h3', null, s.title), offlineTag(s))),
       h('div', { class: 'item-actions' },
         h('button', { class: 'icon-btn' + (s.read ? ' on' : ''), 'aria-label': s.read ? 'Marquer comme non lu' : 'Marquer comme lu', onclick: () => setRead(s.id, !s.read) },
           svgIcon('M5 12l5 5L20 7')),
@@ -398,6 +468,52 @@ function renderSaved() {
     list.append(row);
   }
 }
+
+function offlineTag(s) {
+  if (!s.stored) return null;
+  return s.offline === 'partial'
+    ? h('span', { class: 'offline partial', title: "Réservé aux abonnés : seul le début est disponible sans réseau" }, svgIcon('M12 4v11M7 10l5 5 5-5M5 20h14'), 'Début hors ligne')
+    : h('span', { class: 'offline', title: 'Lisible sans réseau' }, svgIcon('M12 4v11M7 10l5 5 5-5M5 20h14'), 'Hors ligne');
+}
+
+/* ---------- liseuse (articles préchargés) ---------- */
+async function openReader(s) {
+  let art = null;
+  try { art = await (await (await caches.open(ART_CACHE)).match(artUrl(s.id)))?.json(); } catch { art = null; }
+  if (!art) {   // cache vidé par le téléphone : on retombe sur le site
+    s.stored = false; store.set('saved', saved);
+    setRead(s.id, true);
+    window.open(s.link, '_blank', 'noopener');
+    return;
+  }
+  const body = $('#reader-body');
+  const blocks = art.blocks || [];
+  const out = [
+    h('div', { class: 'meta' }, metaLine(s)),
+    h('h1', null, s.title),
+    art.byline ? h('p', { class: 'byline' }, art.byline) : null,
+  ];
+  if (s.image && !blocks.some((b) => b.t === 'img' && b.src === s.image)) out.push(h('figure', null, img(s.image)));
+  let list = null;
+  for (const b of blocks) {
+    if (b.t !== 'li') list = null;
+    if (b.t === 'p') out.push(h('p', null, b.text));
+    else if (b.t === 'h') out.push(h('h2', null, b.text));
+    else if (b.t === 'q') out.push(h('blockquote', null, b.text));
+    else if (b.t === 'li') { if (!list) { list = h('ul'); out.push(list); } list.append(h('li', null, b.text)); }
+    else if (b.t === 'img') out.push(h('figure', null, img(b.src, b.caption), b.caption ? h('figcaption', null, b.caption) : null));
+  }
+  if (art.partial) {
+    out.push(h('p', { class: 'reader-note' }, "La suite est réservée aux abonnés : seul le début de l'article a pu être enregistré. Ouvre-le sur le site une fois connecté."));
+  }
+  out.push(h('a', { class: 'btn', href: s.link, target: '_blank', rel: 'noopener' }, "Ouvrir l'article sur le site"));
+  body.replaceChildren(...out.filter(Boolean));
+  $('#reader-link').href = s.link;
+  $('#reader').showModal();
+  $('#reader').scrollTop = 0;
+  setRead(s.id, true);
+}
+$('#reader-close').addEventListener('click', () => $('#reader').close());
 
 function svgIcon(d) {
   const ns = 'http://www.w3.org/2000/svg';
@@ -423,7 +539,10 @@ function removeSaved(id) {
   const [removed] = saved.splice(idx, 1);
   store.set('saved', saved);
   renderSaved(); renderSavedCount();
+  // la version hors connexion n'est effacée qu'une fois le délai d'annulation passé
+  const timer = setTimeout(() => { if (!saved.some((x) => x.id === id)) forget(id, removed.image); }, 4500);
   toast('Article retiré', 'Annuler', () => {
+    clearTimeout(timer);
     saved.splice(idx, 0, removed);
     store.set('saved', saved);
     renderSaved(); renderSavedCount();
@@ -569,10 +688,11 @@ async function init() {
       return;
     }
     const poolIsToday = localDay(new Date(pool.generatedAt)) === localDay();
-    if (!poolIsToday && edition) { showWaiting(); renderSavedCount(); return; }
+    if (!poolIsToday && edition) { showWaiting(); renderSavedCount(); syncOffline(); return; }
     newEdition();
   }
   render();
+  syncOffline();
 }
 
 if ('serviceWorker' in navigator) {
