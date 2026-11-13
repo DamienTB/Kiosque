@@ -116,6 +116,17 @@
     </article>
   </dialog>
 
+  <!-- Liseuse : articles gardés, lisibles sans réseau -->
+  <dialog id="reader" class="reader" aria-label="Article">
+    <div class="reader-bar">
+      <button class="btn ghost" id="reader-close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg> À lire
+      </button>
+      <a class="btn ghost" id="reader-link" target="_blank" rel="noopener">Site</a>
+    </div>
+    <article class="reader-body" id="reader-body"></article>
+  </dialog>
+
   <div class="toast" id="toast" role="status" hidden></div>
 
   <script src="app.js"></script>

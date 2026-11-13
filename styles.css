@@ -287,3 +287,48 @@ dialog::backdrop { background: rgba(10, 8, 5, .45); }
 }
 .card-img.noimg-fallback .fallback-name { display: block; color: #fff; font-family: var(--serif); font-size: 22px; font-weight: 700; }
 .detail-img.noimg-fallback, .thumb.noimg-fallback { display: none; }
+
+/* ---------- hors connexion ---------- */
+.offline {
+  display: inline-flex; align-items: center; gap: 4px; margin-top: 6px;
+  font-size: 11.5px; font-weight: 600; color: var(--free);
+}
+.offline.partial { color: var(--mixed); }
+.offline svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+dialog.reader {
+  width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh;
+  margin: 0; border-radius: 0; background: var(--paper);
+  overscroll-behavior: contain;
+}
+@media (min-width: 640px) { dialog.reader { width: min(720px, 100vw); margin: 0 auto; border-radius: 0; } }
+.reader-bar {
+  position: sticky; top: 0; z-index: 1;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: calc(6px + env(safe-area-inset-top)) 8px 6px;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.reader-bar .btn { display: inline-flex; align-items: center; gap: 4px; }
+.reader-bar svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.reader-body {
+  padding: 18px 20px calc(40px + env(safe-area-inset-bottom));
+  font-family: var(--serif); font-size: 18.5px; line-height: 1.6; color: var(--ink);
+  overflow-wrap: break-word;
+}
+.reader-body .meta { font-family: var(--sans); }
+.reader-body h1 { font-size: 27px; line-height: 1.22; margin: 10px 0 6px; }
+.reader-body h2 { font-size: 21px; line-height: 1.3; margin: 28px 0 8px; }
+.reader-body .byline { font-family: var(--sans); font-size: 14px; color: var(--ink-2); margin: 0 0 14px; }
+.reader-body p { margin: 0 0 1em; }
+.reader-body blockquote { margin: 1.2em 0; padding: 2px 0 2px 16px; border-left: 3px solid var(--accent); color: var(--ink-2); font-style: italic; }
+.reader-body ul { padding-left: 1.2em; margin: 0 0 1em; }
+.reader-body figure { margin: 18px -20px; }
+.reader-body figure img { width: 100%; height: auto; display: block; }
+.reader-body figcaption { font-family: var(--sans); font-size: 13px; color: var(--ink-3); padding: 6px 20px 0; line-height: 1.4; }
+.reader-note {
+  font-family: var(--sans); font-size: 14.5px; line-height: 1.5; color: var(--ink-2);
+  padding: 12px 14px; border-radius: 12px; background: color-mix(in srgb, var(--mixed) 12%, transparent);
+}
+.reader-body > .btn { width: 100%; margin-top: 12px; text-align: center; }

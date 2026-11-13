@@ -31,6 +31,7 @@
   { "id": "aljazeera", "name": "Al Jazeera English", "lang": "en", "access": "free", "enabled": false, "feeds": ["https://www.aljazeera.com/xml/rss/all.xml"] },
   { "id": "nyt", "name": "The New York Times", "lang": "en", "access": "mixed", "enabled": true, "feeds": ["https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml"] },
   { "id": "atlantic", "name": "The Atlantic", "lang": "en", "access": "mixed", "enabled": false, "feeds": ["https://www.theatlantic.com/feed/all/"] },
+  { "id": "foreignpolicy", "name": "Foreign Policy", "lang": "en", "access": "mixed", "enabled": true, "feeds": ["https://foreignpolicy.com/feed/"] },
   { "id": "economist", "name": "The Economist", "lang": "en", "access": "paid", "enabled": false, "feeds": ["https://www.economist.com/latest/rss.xml"] },
   { "id": "ft", "name": "Financial Times", "lang": "en", "access": "paid", "enabled": false, "feeds": ["https://www.ft.com/rss/home"] }
 ]
